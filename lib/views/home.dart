@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:wallpaperapp/data/category_data.dart';
 import 'package:wallpaperapp/models/category_model.dart';
+import 'package:wallpaperapp/models/wallpaper_model.dart';
 import 'package:wallpaperapp/widgets/logo.dart';
+import 'package:http/http.dart' as http;
+import 'package:wallpaperapp/widgets/wallpaper_tile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,8 +18,37 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<CategoriesModel> categories = [];
 
+  List<WallpaperModel> wallpapers = [];
+
+  //a function to get data from the api
+  getCuratedWallpapers() async {
+    var response = await http.get(
+        Uri.parse('https://api.pexels.com/v1/curated?per_page=60'),
+        headers: {
+          'Authorization':
+              'ZHr9xwZwVMfvRUNVipYrAobnuG3ivJHpZymiDZMDSS711WX2484H19H6'
+        });
+
+    //to check if its working -- It works
+    //print(response.body);
+
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+    jsonData['photos'].forEach((element) {
+      //check if it works -- It works
+      //print(element);
+      WallpaperModel wallpaperModel = WallpaperModel.fromMap(element);
+
+      //add this model to the list
+      wallpapers.add(wallpaperModel);
+    });
+
+    setState(() {});
+  }
+
   @override
   void initState() {
+    getCuratedWallpapers();
     categories = getCategories();
     super.initState();
   }
@@ -28,47 +62,56 @@ class _HomeState extends State<Home> {
         title: const Logo(),
         elevation: 0.0,
       ),
-      body: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-                color: const Color(0XFFf5f8fd),
-                borderRadius: BorderRadius.circular(20)),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: TextField(
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        decorationThickness: 0.0),
-                    decoration: InputDecoration(
-                        hintText: 'search wallpapers',
-                        border: InputBorder.none),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                  color: const Color(0XFFf5f8fd),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: TextField(
+                      style: TextStyle(
+                          decoration: TextDecoration.none,
+                          decorationThickness: 0.0),
+                      decoration: InputDecoration(
+                          hintText: 'search wallpapers',
+                          border: InputBorder.none),
+                    ),
                   ),
-                ),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.search))
-              ],
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.search))
+                ],
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 50,
-            child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return CategoryTile(
-                      imgUrl: categories[index].imgUrl,
-                      title: categories[index].categoryName);
-                }),
-          )
-        ],
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 13),
+              child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    return CategoryTile(
+                        imgUrl: categories[index].imgUrl,
+                        title: categories[index].categoryName);
+                  }),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            WallpaperTile(
+              wallpapers: wallpapers,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -82,10 +125,10 @@ class CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 10),
+      margin: const EdgeInsets.only(right: 6),
       child: Stack(children: [
         ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             child: Image.network(
               imgUrl,
               height: 50,
