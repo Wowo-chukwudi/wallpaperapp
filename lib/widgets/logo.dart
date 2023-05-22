@@ -7,18 +7,23 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Wallpaper',
-          style: TextStyle(color: Colors.black),
-        ),
-        Text(
-          'Hub',
-          style: TextStyle(color: Colors.orange),
-        ),
-      ],
+    return RichText(
+      text: const TextSpan(
+        children: <TextSpan>[
+          TextSpan(
+              text: 'Chu\'s Wallpaper',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 23,
+                  color: Colors.black)),
+          TextSpan(
+              text: 'Hub',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 23,
+                  color: Colors.orange)),
+        ],
+      ),
     );
   }
 }

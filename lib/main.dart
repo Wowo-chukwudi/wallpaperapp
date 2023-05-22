@@ -13,7 +13,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Wallpaper App',
-      theme: ThemeData(primaryColor: Colors.white),
+      //theme: ThemeData(primaryColor: Colors.white),
       home: const Home(),
     );
   }
